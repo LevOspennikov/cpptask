@@ -84,8 +84,9 @@ int read_file(char *filename) {
     FILE *fp;
 
     fp = fopen(filename, "r+");
-    rewind(fp);
-
+    if (fp == NULL) {
+        return -1;
+    }
     int id;
     while (fscanf(fp, "%d", &id) != EOF) {
         char *name = read_str(fp);
