@@ -98,19 +98,31 @@ int read_file(char *filename) {
     return 0;
 }
 
-struct Users *find(int id, char *name, char *num) {
+struct Users *find(int id, char *name, char *num, int need_print) {
     for (int i = 0; i < size; i++) {
         if (id != -1) {
             if (id == book[i].user_id) {
-                return &book[i];
+                if (need_print) {
+                    printf("%d %s %s\n", book[i].user_id, book[i].name, book[i].num);
+                } else {
+                    return &book[i];
+                }
             }
         } else if (name != NULL) {
             if (compare_name(book[i].name, name)) {
-                return &book[i];
+                if (need_print) {
+                    printf("%d %s %s\n", book[i].user_id, book[i].name, book[i].num);
+                } else {
+                    return &book[i];
+                }
             }
         } else if (num != NULL) {
             if (compare_number(num, book[i].num)) {
-                return &book[i];
+                if (need_print) {
+                    printf("%d %s %s\n", book[i].user_id, book[i].name, book[i].num);
+                } else {
+                    return &book[i];
+                }
             }
         }
     }
@@ -203,19 +215,12 @@ int main(int argc, char *argv[]) {
 
         if (!strcmp(ptr, "find")) {
             ptr = strtok(NULL, " ");
-            struct Users *user1 = find(-1, ptr, NULL);
-            struct Users *user2 = find(-1, NULL, ptr);
-            if (user1 != NULL) {
-                printf("%d %s %s\n", user1->user_id, user1->name, user1->num);
-            } else if (user2 != NULL) {
-                printf("%d %s %s\n", user2->user_id, user2->name, user2->num);
-            } else {
-                printf("Cant find user: %s\n", ptr);
-            }
+            find(-1, ptr, NULL, 1);
+            find(-1, NULL, ptr, 1);
         } else if (!strcmp(ptr, "delete")) {
             ptr = strtok(NULL, " ");
             int id = atoi(ptr);
-            struct Users *user1 = find(id, NULL, NULL);
+            struct Users *user1 = find(id, NULL, NULL, 0);
             user1->exist = 0;
         } else if (!strcmp(ptr, "create")) {
             maxid += 1;
@@ -225,7 +230,7 @@ int main(int argc, char *argv[]) {
         } else if (!strcmp(ptr, "change")) {
             ptr = strtok(NULL, " ");
             int id = atoi(ptr);
-            struct Users *user1 = find(id, NULL, NULL);
+            struct Users *user1 = find(id, NULL, NULL, 0);
             ptr = strtok(NULL, " ");
             if (!strcmp(ptr, "name")) {
                 user1->name = strtok(NULL, " ");
