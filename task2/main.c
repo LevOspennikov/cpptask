@@ -100,28 +100,30 @@ int read_file(char *filename) {
 
 struct Users *find(int id, char *name, char *num, int need_print) {
     for (int i = 0; i < size; i++) {
-        if (id != -1) {
-            if (id == book[i].user_id) {
-                if (need_print) {
-                    printf("%d %s %s\n", book[i].user_id, book[i].name, book[i].num);
-                } else {
-                    return &book[i];
+        if (book[i].exist) {
+            if (id != -1) {
+                if (id == book[i].user_id) {
+                    if (need_print) {
+                        printf("%d %s %s\n", book[i].user_id, book[i].name, book[i].num);
+                    } else {
+                        return &book[i];
+                    }
                 }
-            }
-        } else if (name != NULL) {
-            if (compare_name(book[i].name, name)) {
-                if (need_print) {
-                    printf("%d %s %s\n", book[i].user_id, book[i].name, book[i].num);
-                } else {
-                    return &book[i];
+            } else if (name != NULL) {
+                if (compare_name(book[i].name, name)) {
+                    if (need_print) {
+                        printf("%d %s %s\n", book[i].user_id, book[i].name, book[i].num);
+                    } else {
+                        return &book[i];
+                    }
                 }
-            }
-        } else if (num != NULL) {
-            if (compare_number(num, book[i].num)) {
-                if (need_print) {
-                    printf("%d %s %s\n", book[i].user_id, book[i].name, book[i].num);
-                } else {
-                    return &book[i];
+            } else if (num != NULL) {
+                if (compare_number(num, book[i].num)) {
+                    if (need_print) {
+                        printf("%d %s %s\n", book[i].user_id, book[i].name, book[i].num);
+                    } else {
+                        return &book[i];
+                    }
                 }
             }
         }
@@ -199,6 +201,30 @@ void write_to_book(int id, char *name, char *num) {
     size++;
 }
 
+int check_name(char *name) {
+    if ((name == NULL) || (strcmp(name, "") == 0)) {
+        return 0;
+    }
+    for (int i = 0; name[i] != '\0'; i++) {
+        if (!isalpha(name[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int check_num(char *num) {
+    if ((num == NULL) || (strcmp(num, "") == 0)) {
+        return 0;
+    }
+    for (int i = 0; num[i] != '\0'; i++) {
+        if (!isdigit(num[i]) && num[i] != '(' && num[i] != ')' && num[i] != '-' && num[i] != '+' ) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int main(int argc, char *argv[]) {
 
     signal(SIGINT, stop_program);
@@ -221,23 +247,33 @@ int main(int argc, char *argv[]) {
             ptr = strtok(NULL, " ");
             int id = atoi(ptr);
             struct Users *user1 = find(id, NULL, NULL, 0);
-            user1->exist = 0;
+            if (user1 != NULL) {
+                user1->exist = 0;
+            }
         } else if (!strcmp(ptr, "create")) {
-            maxid += 1;
+
             char *name = strtok(NULL, " ");
+
             char *num = strtok(NULL, " ");
-            write_to_book(maxid, name, num);
+            if (check_name(name) && check_num(num)) {
+                maxid += 1;
+                write_to_book(maxid, name, num);
+            } else {
+                printf("Wrong format %s %s \n", name, num);
+            }
         } else if (!strcmp(ptr, "change")) {
             ptr = strtok(NULL, " ");
             int id = atoi(ptr);
             struct Users *user1 = find(id, NULL, NULL, 0);
-            ptr = strtok(NULL, " ");
-            if (!strcmp(ptr, "name")) {
-                user1->name = strtok(NULL, " ");
-            } else if (!strcmp(ptr, "number")) {
-                user1->num = strtok(NULL, " ");
-            } else {
-                printf("Unknown field %s\n", ptr);
+            if (user1 != NULL) {
+                ptr = strtok(NULL, " ");
+                if (!strcmp(ptr, "name")) {
+                    user1->name = strtok(NULL, " ");
+                } else if (!strcmp(ptr, "number")) {
+                    user1->num = strtok(NULL, " ");
+                } else {
+                    printf("Unknown field %s\n", ptr);
+                }
             }
         } else if (!strcmp(ptr, "exit")) {
             stop_program(1);
