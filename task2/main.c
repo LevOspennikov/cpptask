@@ -5,6 +5,8 @@
 #include <ctype.h>
 #include <signal.h>
 
+#include <unistd.h>
+
 #define MAX(a, b) (((a)>(b))?(a):(b))
 
 char *filename;
@@ -183,10 +185,6 @@ void write_book_to_file(char *filename) {
 void stop_program(int t) {
     stop = 1;
     write_book_to_file(filename);
-    for (int i = 0; i < size; i++) {
-        free(book[i].name);
-        free(book[i].num);
-    }
     free(book);
     exit(0);
 }
